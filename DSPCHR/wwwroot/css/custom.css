@@ -1,0 +1,9 @@
+﻿@font-face {
+    font-family: 'prometheus';
+    src: url('../fonts/prometheus.ttf');
+}
+
+.stylised-text
+{
+    font-family: prometheus;
+}

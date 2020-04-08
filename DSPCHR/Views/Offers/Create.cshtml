@@ -1,0 +1,74 @@
+﻿@model DSPCHR.ViewModels.OfferViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Offer</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="@Model.Offer.ShortCodeId" class="control-label"></label>
+                @*<input asp-for="@Model.Offer.ShortCodeId" class="form-control" />*@
+                <select asp-for="@Model.Offer.ShortCodeId" asp-items="@Model.ShortCodes" class="form-control"></select>
+                <span asp-validation-for="@Model.Offer.ShortCodeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Offer.OfferCode" class="control-label"></label>
+                <input asp-for="@Model.Offer.OfferCode" class="form-control" />
+                <span asp-validation-for="@Model.Offer.OfferCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Offer.Name" class="control-label"></label>
+                <input asp-for="@Model.Offer.Name" class="form-control" />
+                <span asp-validation-for="@Model.Offer.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Offer.Description" class="control-label"></label>
+                <input asp-for="@Model.Offer.Description" class="form-control" />
+                <span asp-validation-for="@Model.Offer.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Offer.ActivationKeywords" class="control-label"></label>
+                <input asp-for="@Model.Offer.ActivationKeywords" class="form-control" />
+                <span asp-validation-for="@Model.Offer.ActivationKeywords" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Offer.DeactivationKeywords" class="control-label"></label>
+                <input asp-for="@Model.Offer.DeactivationKeywords" class="form-control" />
+                <span asp-validation-for="@Model.Offer.DeactivationKeywords" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Offer.ActivationWelcomeMessage" class="control-label"></label>
+                <input asp-for="@Model.Offer.ActivationWelcomeMessage" class="form-control" />
+                <span asp-validation-for="@Model.Offer.ActivationWelcomeMessage" class="text-danger"></span>
+            </div>
+            @*<div class="form-group">
+            <label asp-for="CreatedAt" class="control-label"></label>
+            <input asp-for="CreatedAt" class="form-control" />
+            <span asp-validation-for="CreatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastUpdatedAt" class="control-label"></label>
+                <input asp-for="LastUpdatedAt" class="form-control" />
+                <span asp-validation-for="LastUpdatedAt" class="text-danger"></span>
+            </div>*@
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

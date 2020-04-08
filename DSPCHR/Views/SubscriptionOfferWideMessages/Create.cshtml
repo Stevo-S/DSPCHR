@@ -1,0 +1,63 @@
+﻿@model DSPCHR.ViewModels.SubscriptionOfferWideMessageViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>SubscriptionOfferWideMessage</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="@Model.Content" class="control-label"></label>
+                <textarea asp-for="@Model.Content" class="form-control" required></textarea>
+                <span asp-validation-for="@Model.Content" class="text-danger"></span>
+            </div>
+            @*<div class="form-group">
+                <label asp-for="@Model.OfferWideMessage.OfferCode" class="control-label"></label>
+                <input asp-for="@Model.OfferWideMessage.OfferCode" class="form-control" />
+                <span asp-validation-for="@Model.OfferWideMessage.OfferCode" class="text-danger"></span>
+            </div>*@
+            @*<div class="form-group">
+                <label asp-for="@Model.OfferWideMessage.ShortCode" class="control-label"></label>
+                <input asp-for="@Model.OfferWideMessage.ShortCode" class="form-control" />
+                <span asp-validation-for="@Model.OfferWideMessage.ShortCode" class="text-danger"></span>
+            </div>*@
+            <div class="form-group">
+                <label asp-for="@Model.OfferCode" class="control-label"></label>
+                <select asp-for="@Model.OfferCodes" asp-items="@Model.Offers" class="form-control" required></select>
+                <span asp-validation-for="@Model.ShortCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.SendAt" class="control-label"></label>
+                <input asp-for="@Model.SendAt" class="form-control" />
+                <span asp-validation-for="@Model.SendAt" class="text-danger"></span>
+            </div>
+            @*<div class="form-group">
+            <label asp-for="CreatedAt" class="control-label"></label>
+            <input asp-for="CreatedAt" class="form-control" />
+            <span asp-validation-for="CreatedAt" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="LastUpdatedAt" class="control-label"></label>
+            <input asp-for="LastUpdatedAt" class="form-control" />
+            <span asp-validation-for="LastUpdatedAt" class="text-danger"></span>
+        </div>*@
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
