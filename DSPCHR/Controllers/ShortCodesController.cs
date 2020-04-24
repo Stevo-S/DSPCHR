@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DSPCHR.Data;
 using DSPCHR.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DSPCHR.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class ShortCodesController : Controller
     {
         private readonly ApplicationDbContext _context;

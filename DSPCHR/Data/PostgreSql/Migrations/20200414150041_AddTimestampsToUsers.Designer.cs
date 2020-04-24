@@ -3,15 +3,17 @@ using System;
 using DSPCHR.Data.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace DSPCHR.Data.PostgreSql.Migrations
 {
     [DbContext(typeof(PostgreSqlContext))]
-    partial class PostgreSqlContextModelSnapshot : ModelSnapshot
+    [Migration("20200414150041_AddTimestampsToUsers")]
+    partial class AddTimestampsToUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,21 +89,6 @@ namespace DSPCHR.Data.PostgreSql.Migrations
                         .HasName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
-                });
-
-            modelBuilder.Entity("DSPCHR.Models.ApplicationUserOffer", b =>
-                {
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("text");
-
-                    b.Property<long>("OfferId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("ApplicationUserId", "OfferId");
-
-                    b.HasIndex("OfferId");
-
-                    b.ToTable("ApplicationUserOffer");
                 });
 
             modelBuilder.Entity("DSPCHR.Models.Offer", b =>
@@ -396,21 +383,6 @@ namespace DSPCHR.Data.PostgreSql.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("DSPCHR.Models.ApplicationUserOffer", b =>
-                {
-                    b.HasOne("DSPCHR.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("ApplicationUserOffers")
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DSPCHR.Models.Offer", "Offer")
-                        .WithMany("ApplicationUserOffers")
-                        .HasForeignKey("OfferId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("DSPCHR.Models.Offer", b =>

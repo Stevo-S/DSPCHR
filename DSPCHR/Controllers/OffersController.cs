@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using DSPCHR.Data;
 using DSPCHR.Models;
 using DSPCHR.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DSPCHR.Controllers
 {
+    [Authorize]
     public class OffersController : Controller
     {
         private readonly ApplicationDbContext _context;

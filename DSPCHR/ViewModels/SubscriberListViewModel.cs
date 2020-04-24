@@ -14,7 +14,11 @@ namespace DSPCHR.ViewModels
             Subscribers = new PagedResult<Subscriber>();
         }
 
-        public string Query { get; set; } = string.Empty;
         public PagedResult<Subscriber> Subscribers { get; set; }
+        public string PhoneNumber { get; set; } = string.Empty;
+        public DateTime? From { get; set; } = null;
+        public DateTime? To { get; set; } = null;
+        public string SubscriptionStatus { get; set; } = "any";
+
     }
 }

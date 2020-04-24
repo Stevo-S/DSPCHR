@@ -1,4 +1,5 @@
 ﻿using DSPCHR.Authorisation;
+using DSPCHR.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,17 +14,17 @@ namespace DSPCHR.Data
     {
         public static async Task Initialize(IServiceProvider serviceProvider, string defaultAdminPassword)
         {
-            using (var context = new ApplicationDbContext(
-                serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
+            using (var context = serviceProvider.GetRequiredService<ApplicationDbContext>())
             {
-                // For sample purposes seed both with the same password.
                 // Password is set with the following:
-                // dotnet user-secrets set SeedUserPW <pw>
+                // dotnet user-secrets set DefaultAdminPassword
                 // The admin user can do anything
 
-                var adminID = await EnsureAdminUser(serviceProvider, defaultAdminPassword, "admin");
+                var adminID = await EnsureAdminUser(serviceProvider, defaultAdminPassword, "Administrator");
                 await EnsureAdminRole(serviceProvider, adminID, RoleNames.AdministratorsRoleName);
-                await EnsureRoleExists(serviceProvider, "Support");
+                await EnsureRoleExists(serviceProvider, RoleNames.SubscribersMonitorsRoleName);
+                await EnsureRoleExists(serviceProvider, RoleNames.SupportRoleName);
+                await EnsureRoleExists(serviceProvider, RoleNames.ClientsRoleName);
             }
         }
 
@@ -42,7 +43,7 @@ namespace DSPCHR.Data
             {
                 IR = await roleManager.CreateAsync(new IdentityRole(roleName));
             }
-
+             
             return IR;
         }
 
@@ -50,9 +51,9 @@ namespace DSPCHR.Data
         {
             IdentityResult IR = await EnsureRoleExists(serviceProvider, roleName);
 
-            var userManager = serviceProvider.GetService<UserManager<IdentityResult>>();
+            var userManager = serviceProvider.GetService<UserManager<ApplicationUser>>();
 
-            var user = await userManager.FindByNameAsync(userId);
+            var user = await userManager.FindByIdAsync(userId);
 
             if (user == null)
             {
@@ -66,18 +67,20 @@ namespace DSPCHR.Data
 
         private static async Task<string> EnsureAdminUser(IServiceProvider serviceProvider, string defaultAdminPassword, string userName)
         {
-            var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
+            var userManager = serviceProvider.GetService<UserManager<ApplicationUser>>();
 
             var user = await userManager.FindByNameAsync(userName);
             if (user == null)
             {
-                user = new IdentityUser
+                user = new ApplicationUser
                 {
                     UserName = userName,
                     Email = "admin@example.com",
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    CreatedAt = DateTime.Now,
+                    LastUpdated = DateTime.Now
                 };
-                await userManager.CreateAsync(user);
+                await userManager.CreateAsync(user, defaultAdminPassword);
             }
 
             if (user == null)

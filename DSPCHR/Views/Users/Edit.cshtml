@@ -1,0 +1,78 @@
+﻿@model DSPCHR.ViewModels.UserViewModel
+
+@{
+    ViewData["Title"] = "Update User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Edit</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="@Model.UserName" class="control-label"></label>
+                <input asp-for="@Model.UserName" class="form-control" />
+                <span asp-validation-for="@Model.UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Email" class="control-label"></label>
+                <input asp-for="@Model.Email" class="form-control" />
+                <span asp-validation-for="@Model.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Password" class="control-label"></label>
+                <input asp-for="@Model.Password" class="form-control" />
+                <span asp-validation-for="@Model.Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.ConfirmPassword" class="control-label"></label>
+                <input asp-for="@Model.ConfirmPassword" class="form-control" />
+                <span asp-validation-for="@Model.ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div>
+                <fieldset class="form-group border p-2">
+                    <legend class="w-auto">Allowed Short Code Offers</legend>
+                    @{
+                        foreach (var offer in Model.Offers)
+                        {
+                            <div class="form-check">
+                                <input asp-for="@offer.Allowed" name="allowedOffers" value="@offer.OfferId" class="form-check-input" />
+                                <label asp-for="@offer.Allowed" class="form-check-label">@offer.ShortCode : @offer.OfferName</label>
+                            </div>
+                        }
+                    }
+                </fieldset>
+            </div>
+            <div class="col">
+                <fieldset class="form-group border p-2">
+                    <legend class="w-auto">Assign Roles to New User</legend>
+                    @{
+                        foreach (var role in Model.Roles)
+                        {
+                            <div class="form-check">
+                                <input asp-for="@role.Assigned" name="assignedRoles" value="@role.Name" class="form-check-input" />
+                                <label asp-for="@role.Assigned" class="form-check-label">@role.Name</label>
+                            </div>
+                        }
+                    }
+                </fieldset>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <input type="submit" value="Update" class="btn btn-primary" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

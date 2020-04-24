@@ -18,5 +18,7 @@ namespace DSPCHR.Models
         public DateTime LastUpdatedAt { get; set; }
         public long ShortCodeId { get; set; }
         public virtual ShortCode ShortCode { get; set; }
+
+        public List<ApplicationUserOffer> ApplicationUserOffers { get; set; }
     }
 }

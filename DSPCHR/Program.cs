@@ -29,9 +29,9 @@ namespace DSPCHR
 
                     var config = host.Services.GetRequiredService<IConfiguration>();
 
-                    var defaultAdminPassword = config["DefaultAdminPassword"];
+                    var defaultAdminPassword = config["DefaultAdminPassword"] ?? "P455_w0rd";
 
-                    SeedData.Initialize(services, defaultAdminPassword).Wait();
+                     SeedData.Initialize(services, defaultAdminPassword).Wait();
                 }
                 catch (Exception ex)
                 {

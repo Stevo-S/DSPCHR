@@ -1,16 +1,41 @@
 ﻿@model DSPCHR.ViewModels.SubscriberListViewModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Subscribers";
 }
 
-<h1>Index</h1>
+<h1>List</h1>
 
 <h3 class="text-right">Total: @Model.Subscribers.TotalItems</h3>
 
 @*<p>
     <a asp-action="Create">Create New</a>
 </p>*@
+<div class="row">
+    <form asp-action="Index" class="form-inline" method="get">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <span><strong>Last Subscribed &nbsp;</strong></span>
+
+        <div class="input-group mb-2 mr-sm-2">
+            <div class="input-group-prepend">
+                <div class="input-group-text">From</div>
+            </div>
+            <input asp-for="@Model.From">
+        </div>
+
+        <div class="input-group mb-2 mr-sm-2">
+            <div class="input-group-prepend">
+                <div class="input-group-text">To</div>
+            </div>
+            <input asp-for="@Model.To">
+        </div>
+
+        <button type="submit" class="btn btn-primary mb-2">Filter</button>
+    </form>
+</div>
+
+<hr />
 
 <table class="table">
     <thead>
@@ -99,6 +124,10 @@
         cs-pager-link-current-class="page-link"
         cs-pager-link-other-class="page-link"
         asp-controller="Subscribers"
-        asp-action="Index">
+        asp-action="Index"
+        asp-route-phoneNumber="@Model.PhoneNumber"
+        asp-route-to="@Model.To?.ToString("s")"
+        asp-route-from="@Model.From?.ToString("s")"
+        asp-route-subscriptionStatus="@Model.SubscriptionStatus">
     </cs-pager>
 </div>

@@ -9,9 +9,11 @@ using DSPCHR.Data;
 using DSPCHR.Models;
 using DSPCHR.ViewModels;
 using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DSPCHR.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class SubscriptionOfferWideMessagesController : Controller
     {
         private readonly ApplicationDbContext _context;
