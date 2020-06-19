@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace DSPCHR.Controllers
 {
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Roles = "Administrators")]
     public class ShortCodesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -56,7 +56,7 @@ namespace DSPCHR.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Code,IsActive,CreatedAt,LastUpdatedAt")] ShortCode shortCode)
+        public async Task<IActionResult> Create([Bind("Id,Code,IsActive")] ShortCode shortCode)
         {
             if (ModelState.IsValid)
             {

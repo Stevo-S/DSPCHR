@@ -1,0 +1,26 @@
+﻿@model DSPCHR.ViewModels.WebActivatorLobbyViewModel
+@{
+    Layout = null;
+    
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Lobby</title>
+    <link rel="stylesheet" href="~/css/webactivators.css" />
+</head>
+<body>
+    <div>
+        <a target="_self" href="@Model.SubscriptionLink" id="subscribeLink" data-offercode="@Model.WebActivator.Offer.OfferCode" data-msisdn="" data-clickId="@Model.ClickId">
+            @*<img src="@Url.Action("BannerImage", new { id = Model.WebActivator.Id})" alt="banner image" class="responsive_banner" />*@
+            @*<img src="//:0" alt="banner image placeholder" class="responsive_banner" />*@
+        </a>
+    </div>
+
+    <script src="~/js/webactivator.js"></script>
+
+</body>
+</html>

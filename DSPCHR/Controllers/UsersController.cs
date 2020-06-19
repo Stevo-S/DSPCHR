@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DSPCHR.Controllers
 {
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Roles = "Administrators")]
     public class UsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

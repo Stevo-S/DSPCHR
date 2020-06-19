@@ -16,7 +16,7 @@ namespace DSPCHR.Data.PostgreSql.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.2")
+                .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("DSPCHR.Models.ApplicationUser", b =>
@@ -268,6 +268,80 @@ namespace DSPCHR.Data.PostgreSql.Migrations
                     b.ToTable("SubscriptionOfferWideMessages");
                 });
 
+            modelBuilder.Entity("DSPCHR.Models.WebActivationClick", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("ClickId")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Converted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Msisdn")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OfferCode")
+                        .HasColumnType("text");
+
+                    b.Property<long>("WebActivatorId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WebActivatorId");
+
+                    b.ToTable("WebActivationClicks");
+                });
+
+            modelBuilder.Entity("DSPCHR.Models.WebActivator", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Banner")
+                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("ForwardClickId")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<long>("OfferId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PostBackUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UssdFallBack")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OfferId");
+
+                    b.ToTable("WebActivators");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -418,6 +492,24 @@ namespace DSPCHR.Data.PostgreSql.Migrations
                     b.HasOne("DSPCHR.Models.ShortCode", "ShortCode")
                         .WithMany("Offers")
                         .HasForeignKey("ShortCodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DSPCHR.Models.WebActivationClick", b =>
+                {
+                    b.HasOne("DSPCHR.Models.WebActivator", "WebActivator")
+                        .WithMany()
+                        .HasForeignKey("WebActivatorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("DSPCHR.Models.WebActivator", b =>
+                {
+                    b.HasOne("DSPCHR.Models.Offer", "Offer")
+                        .WithMany()
+                        .HasForeignKey("OfferId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

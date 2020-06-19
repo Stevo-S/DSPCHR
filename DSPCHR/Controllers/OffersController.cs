@@ -9,10 +9,11 @@ using DSPCHR.Data;
 using DSPCHR.Models;
 using DSPCHR.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using DSPCHR.Authorisation;
 
 namespace DSPCHR.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrators")]
     public class OffersController : Controller
     {
         private readonly ApplicationDbContext _context;

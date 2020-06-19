@@ -20,7 +20,7 @@ namespace DSPCHR.Data
         {
 
         }
-
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -44,8 +44,9 @@ namespace DSPCHR.Data
         public DbSet<Subscriber> Subscribers { get; set; }
         public DbSet<SubscriptionOfferWideMessage> SubscriptionOfferWideMessages { get; set; }
         public DbSet<OutboundMessage> OutboundMessages { get; set; }
-        // TODO: Add Delivery Reports
-        // TODO: Add Mo Messages
+        public DbSet<WebActivator> WebActivators { get; set; }
+        public DbSet<WebActivationClick> WebActivationClicks { get; set; }
 
+        // TODO: Add Delivery Reports
     }
 }

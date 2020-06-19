@@ -1,0 +1,54 @@
+﻿@model DSPCHR.ViewModels.WebActivatorViewModel
+
+@{
+    ViewData["Title"] = "View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Create new subscription web activator</h1>
+
+<h4>WebActivator</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="@Model.WebActivator.Name" class="control-label"></label>
+                <input asp-for="@Model.WebActivator.Name" class="form-control" />
+                <span asp-validation-for="@Model.WebActivator.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.WebActivator.OfferId" class="control-label"></label>
+                <select asp-for="@Model.WebActivator.OfferId" class="form-control" asp-items="@Model.Offers"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.WebActivator.UssdFallBack" class="control-label"></label>
+                <input asp-for="@Model.WebActivator.UssdFallBack" class="form-control" />
+                <span asp-validation-for="@Model.WebActivator.UssdFallBack" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.WebActivator.ForwardClickId" class="control-label"></label>
+                <input asp-for="@Model.WebActivator.ForwardClickId" class="form-control" />
+                <span asp-validation-for="@Model.WebActivator.ForwardClickId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.WebActivator.PostBackUrl" class="control-label"></label>
+                <input asp-for="@Model.WebActivator.PostBackUrl" class="form-control" />
+                <span asp-validation-for="@Model.WebActivator.PostBackUrl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.WebActivator.Banner" class="control-label"></label>
+                <input asp-for="@Model.WebActivator.Banner" name="banner" class="form-control" type="file" accept="image/*" required />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

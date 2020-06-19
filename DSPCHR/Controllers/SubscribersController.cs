@@ -22,7 +22,7 @@ namespace DSPCHR.Controllers
         private readonly ApplicationDbContext _context;
         private readonly Resources _authorisationResources;
         private readonly UserManager<ApplicationUser> _userManager;
-        public SubscribersController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, 
+        public SubscribersController(ApplicationDbContext context, UserManager<ApplicationUser> userManager,
             Resources resources)
         {
             _context = context;
@@ -31,7 +31,7 @@ namespace DSPCHR.Controllers
         }
 
         // GET: Subscribers
-        public async Task<IActionResult> Index(DateTime? from, DateTime? to, int pageNumber = 1, int pageSize = 25, string subscriptionStatus = "any", 
+        public async Task<IActionResult> Index(DateTime? from, DateTime? to, int pageNumber = 1, int pageSize = 25, string subscriptionStatus = "",
             string phoneNumber = "", string offerCode = "")
         {
             var currentUser = _userManager.GetUserAsync(User).Result;
@@ -41,25 +41,40 @@ namespace DSPCHR.Controllers
 
             var allowedOfferCodes = new HashSet<string>();
 
+            var offerCodesToQuery = new HashSet<string>();
+
+            var allOffers = _context.Offers.Include(o => o.ShortCode).ToList();
+
             var subscribers = from s in _context.Subscribers select s;
 
             // Only admins are allowed to view subscribers of any/all offer codes by default
             if (!User.IsInRole(RoleNames.AdministratorsRoleName))
             {
+                var allOfferCodes = new HashSet<string>(allOffers.Select(o => o.OfferCode));
+                allowedOfferCodes = new HashSet<string>(_authorisationResources.AllowedOfferCodes(currentUser));
+
+                // Load all offer codes into the view model Offers that user is allowed to view
+                model.Offers.AddRange(allOffers.Where(o => allowedOfferCodes.Contains(o.OfferCode)).Select(o =>
+                    new SelectListItem
+                    {
+                        Text = o.ShortCode.Code,
+                        Value = o.OfferCode,
+                        Selected = o.OfferCode.Equals(offerCode) // Mark as selected if offerCode was specified
+                    }
+                ).ToList());
+
                 // If offer code is not specified,
                 // query subscribers of all offer codes user is allowed to
                 if (string.IsNullOrEmpty(offerCode))
                 {
-                    allowedOfferCodes = new HashSet<string>(_authorisationResources.AllowedOfferCodes(currentUser));
+                    offerCodesToQuery = allowedOfferCodes;
                 }
                 else
                 {
-                    var allOfferCodes = new HashSet<string>(_context.Offers.Select(o => o.Name));
-
                     // Check if offer code exists
                     if (!allOfferCodes.Contains(offerCode))
                     {
-                        return NotFound(); 
+                        return NotFound();
                     }
 
                     if (!allowedOfferCodes.Contains(offerCode))
@@ -68,14 +83,30 @@ namespace DSPCHR.Controllers
                     }
 
                     // Add offer code if it exists and is allowed for the user
-                    allowedOfferCodes.Add(offerCode);
+                    offerCodesToQuery.Add(offerCode);
                 }
             }
-            
-            // Filter by offer codes
-            if (allowedOfferCodes.Any())
+            else
             {
-                subscribers = subscribers.Where(s => allowedOfferCodes.Contains(s.OfferCode));
+                if (!string.IsNullOrEmpty(offerCode))
+                {
+                    offerCodesToQuery.Add(offerCode);
+                }
+                // Load all offer codes into the view model Offers select list if user is admin
+                model.Offers.AddRange(allOffers.Select(o =>
+                    new SelectListItem
+                    {
+                        Text = o.ShortCode.Code,
+                        Value = o.OfferCode,
+                        Selected = o.OfferCode.Equals(offerCode) // Mark as selected if offerCode was specified
+                    }
+                ).ToList());
+            }
+
+            // Filter by offer codes
+            if (offerCodesToQuery.Any())
+            {
+                subscribers = subscribers.Where(s => offerCodesToQuery.Contains(s.OfferCode));
             }
 
             // Filter by phoneNumber
@@ -86,44 +117,48 @@ namespace DSPCHR.Controllers
             }
 
             // Filter by subscription status
+            subscriptionStatus ??= "";
             if (!string.IsNullOrEmpty(subscriptionStatus))
             {
-                if (subscriptionStatus == "active")
+                var status = subscriptionStatus.ToLower();
+
+                if (status == "active")
                 {
                     subscribers = subscribers.Where(s => s.IsActive == true);
                 }
-                else if (subscriptionStatus == "inactive")
+                else if (status == "inactive")
                 {
                     subscribers = subscribers.Where(p => !p.IsActive == true);
                 }
-
-                model.SubscriptionStatus = subscriptionStatus;
             }
+            model.SubscriptionStatus = subscriptionStatus;
+            model.Statuses.Where(s => s.Value.Equals(subscriptionStatus)).FirstOrDefault().Selected = true;
 
-            if (from != null)
+            if (from == null)
             {
-                if (to < from || to == null)
-                {
-                    to = DateTime.Today.AddDays(1);
-                }
-
-                subscribers = subscribers.Where(s => s.LastSubscribedAt > from && s.LastSubscribedAt < to);
-
-                model.From = from;
-                model.To = to;
+                from = DateTime.Today;
+            }
+            
+            if (to < from || to == null)
+            {
+                to = DateTime.Today.AddDays(1);
             }
 
+            subscribers = subscribers.Where(s => s.LastSubscribedAt > from && s.LastSubscribedAt < to);
+            model.From = from;
+            model.To = to;
 
-
-            var result = new PagedResult<Subscriber>(); 
-            result.TotalItems = await subscribers.CountAsync();
+            var result = new PagedResult<Subscriber>
+            {
+                TotalItems = await subscribers.CountAsync(),
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
 
             subscribers = subscribers.OrderByDescending(s => s.LastSubscribedAt)
                                     .Skip(offset).Take(pageSize);
 
             result.Data = await subscribers.AsNoTracking().ToListAsync();
-            result.PageNumber = pageNumber;
-            result.PageSize = pageSize;
 
             model.Subscribers = result;
 

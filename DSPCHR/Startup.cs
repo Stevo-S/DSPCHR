@@ -18,6 +18,9 @@ using DSPCHR.Data.PostgreSql;
 using DSPCHR.Data.SqlServer;
 using Microsoft.AspNetCore.Http;
 using DSPCHR.Models;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
+using System.Net.Http;
 
 namespace DSPCHR
 {
@@ -70,7 +73,15 @@ namespace DSPCHR
             // Use Hangfire to run background jobs
             services.AddHangfireServer();
 
-            services.AddHttpClient<Gateway.Client, Gateway.Client>();
+            services.AddHttpClient<Gateway.Client, Gateway.Client>()
+                .ConfigurePrimaryHttpMessageHandler(() => 
+                {
+                    return new HttpClientHandler()
+                    {
+                        // Set the maximum number of concurrent requests
+                        MaxConnectionsPerServer = 16
+                    };
+                });
 
             services.AddTransient<Jobs.Subscriptions, Jobs.Subscriptions>();
             services.AddTransient<Jobs.Messages, Jobs.Messages>();
@@ -108,6 +119,13 @@ namespace DSPCHR
 
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            //app.UseStaticFiles(new StaticFileOptions
+            //{
+            //    FileProvider = new PhysicalFileProvider(
+            //        Path.Combine(Directory.GetCurrentDirectory(), Configuration["ImageStorageDirectory"])),
+            //    RequestPath = "/imagestore"
+            //});
 
             app.UseRouting();
 
