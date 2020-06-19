@@ -1,0 +1,87 @@
+﻿@model DSPCHR.ViewModels.UserViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>User Details</h1>
+
+<div>
+    <hr />
+    <div class="row">
+        <div class="col col-md-4">
+            <dl>
+                <dt>
+                    @Html.DisplayNameFor(model => model.UserName)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.UserName)
+                </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.Email)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Email)
+                </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.PhoneNumber)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.PhoneNumber)
+                </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.PasswordHash)
+                </dt>
+                <dd class="col-4 text-truncate">
+                    @Html.DisplayFor(model => model.PasswordHash)
+                </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.CreatedAt)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.CreatedAt)
+                </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.LastUpdated)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.LastUpdated)
+                </dd>
+            </dl>
+        </div>
+        <div class="col border-left">
+            <h4>Assigned Roles</h4>
+            <ul class="list-group list-group-flush">
+                @{
+                    foreach (var role in Model.Roles)
+                    {
+                        <li class="list-group-item">
+                            @role.Name
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+        <div class="col border-left">
+            <h4>Allowed Short Code Offers</h4>
+            <dl>
+                @{
+                    foreach (var offer in Model.Offers)
+                    {
+                        <dt>
+                            @offer.ShortCode
+                        </dt>
+                        <dd>
+                            @offer.OfferName
+                        </dd>
+                    }
+                }
+            </dl>
+        </div>
+        
+    </div>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

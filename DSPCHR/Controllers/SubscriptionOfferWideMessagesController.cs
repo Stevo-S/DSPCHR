@@ -9,9 +9,11 @@ using DSPCHR.Data;
 using DSPCHR.Models;
 using DSPCHR.ViewModels;
 using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DSPCHR.Controllers
 {
+    [Authorize(Roles = "Administrators")]
     public class SubscriptionOfferWideMessagesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -26,7 +28,9 @@ namespace DSPCHR.Controllers
         // GET: SubscriptionOfferWideMessages
         public async Task<IActionResult> Index()
         {
-            return View(await _context.SubscriptionOfferWideMessages.ToListAsync());
+            var messages = await _context.SubscriptionOfferWideMessages.
+                OrderByDescending(m => m.Id).ToListAsync();
+            return View(messages);
         }
 
         // GET: SubscriptionOfferWideMessages/Details/5
@@ -68,9 +72,6 @@ namespace DSPCHR.Controllers
         {
             if (ModelState.IsValid)
             {
-                subscriptionOfferWideMessage.CreatedAt = DateTime.Now;
-                subscriptionOfferWideMessage.LastUpdatedAt = DateTime.Now;
-
                 if (offerCodes != null)
                 {
                     string parentJobId = "";
@@ -84,7 +85,10 @@ namespace DSPCHR.Controllers
                             Content = subscriptionOfferWideMessage.Content,
                             OfferCode = offer.OfferCode,
                             ShortCode = offer.ShortCode.Code,
-                            SendAt = subscriptionOfferWideMessage.SendAt
+                            SendAt = subscriptionOfferWideMessage.SendAt,
+                            CreatedAt = DateTime.Now,
+                            LastUpdatedAt = DateTime.Now
+
                         };
 
                         _context.Add(offerMessage);

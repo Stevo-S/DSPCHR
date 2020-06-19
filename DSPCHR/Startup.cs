@@ -17,6 +17,10 @@ using Hangfire.PostgreSql;
 using DSPCHR.Data.PostgreSql;
 using DSPCHR.Data.SqlServer;
 using Microsoft.AspNetCore.Http;
+using DSPCHR.Models;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
+using System.Net.Http;
 
 namespace DSPCHR
 {
@@ -41,10 +45,6 @@ namespace DSPCHR
             string dbms = Configuration["DBMS"] ?? "";
             if (dbms.ToLower().Contains("postgres"))
             {
-                //services.AddDbContext<ApplicationDbContext>(options =>
-                //options.UseNpgsql(
-                //    Configuration.GetConnectionString("PostgreSqlConnection")));
-
                 services.AddDbContext<ApplicationDbContext, PostgreSqlContext>(options =>
                 options.UseNpgsql(
                     Configuration.GetConnectionString("PostgreSqlConnection")));
@@ -64,19 +64,29 @@ namespace DSPCHR
                 services.AddHangfire(config => config.UseSqlServerStorage(Configuration.GetConnectionString("SqlServerConnection")));
             }
 
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
 
             // Use Hangfire to run background jobs
-            //services.AddHangfire(config => config.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
             services.AddHangfireServer();
 
-            services.AddHttpClient<Gateway.Client, Gateway.Client>();
+            services.AddHttpClient<Gateway.Client, Gateway.Client>()
+                .ConfigurePrimaryHttpMessageHandler(() => 
+                {
+                    return new HttpClientHandler()
+                    {
+                        // Set the maximum number of concurrent requests
+                        MaxConnectionsPerServer = 16
+                    };
+                });
 
             services.AddTransient<Jobs.Subscriptions, Jobs.Subscriptions>();
             services.AddTransient<Jobs.Messages, Jobs.Messages>();
+
+            services.AddTransient<Authorisation.Resources>();
 
             // For pagination
             services.AddCloudscribePagination();
@@ -109,6 +119,13 @@ namespace DSPCHR
 
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            //app.UseStaticFiles(new StaticFileOptions
+            //{
+            //    FileProvider = new PhysicalFileProvider(
+            //        Path.Combine(Directory.GetCurrentDirectory(), Configuration["ImageStorageDirectory"])),
+            //    RequestPath = "/imagestore"
+            //});
 
             app.UseRouting();
 

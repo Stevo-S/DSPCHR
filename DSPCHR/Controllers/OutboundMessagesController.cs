@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DSPCHR.Data;
 using DSPCHR.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DSPCHR.Controllers
 {
+    [Authorize]
     public class OutboundMessagesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,7 +24,9 @@ namespace DSPCHR.Controllers
         // GET: OutboundMessages
         public async Task<IActionResult> Index()
         {
-            return View(await _context.OutboundMessages.ToListAsync());
+            var outboundMessages = await 
+                _context.OutboundMessages.OrderByDescending(m => m.CreatedAt).Take(100).ToListAsync();
+            return View(outboundMessages);
         }
 
         // GET: OutboundMessages/Details/5

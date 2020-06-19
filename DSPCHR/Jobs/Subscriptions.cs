@@ -1,9 +1,14 @@
 ﻿using DSPCHR.Data;
 using DSPCHR.Models;
 using Hangfire;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DSPCHR.Jobs
@@ -12,9 +17,15 @@ namespace DSPCHR.Jobs
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly Jobs.Messages _messagesJob;
-        public Subscriptions(ApplicationDbContext applicationDbContext, Jobs.Messages messagesJob)
+        private readonly Gateway.Client _gatewayClient;
+        private readonly IHttpClientFactory _httpClientFactory;
+        public Subscriptions(ApplicationDbContext applicationDbContext, Jobs.Messages messagesJob, 
+            Gateway.Client gatewayClient, IHttpClientFactory clientFactory)
         {
             _dbContext = applicationDbContext;
+            _gatewayClient = gatewayClient;
+            _messagesJob = messagesJob;
+            _httpClientFactory = clientFactory;
         }
 
         // Process subscription notifications
@@ -64,9 +75,38 @@ namespace DSPCHR.Jobs
             
             _dbContext.SaveChanges();
 
-            // Send welcome message to user who has just subscribed
+            // If it was an activation
             if (subscriber.IsActive)
             {
+                // Check if there was a registered click for this MSISDN-OfferCode pair
+                // and record successful conversion
+                var click = _dbContext.WebActivationClicks.Where(wac => wac.Msisdn.Equals(subscriber.Msisdn)
+                    && wac.OfferCode.Equals(subscriber.OfferCode) && !wac.Converted).
+                    OrderByDescending(wac => wac.CreatedAt).Include(wac => wac.WebActivator).FirstOrDefault();
+
+                if (click != null)
+                {
+                    click.Converted = true;
+                    click.LastUpdated = DateTime.Now;
+
+                    _dbContext.SaveChanges();
+
+                    // Post back conversion success
+                    if (click.WebActivator?.PostBackUrl != null)
+                    {
+                        // include original click ID in Postback URL
+                        var postBackUrl = click.WebActivator.PostBackUrl;
+                        postBackUrl = Regex.Replace(postBackUrl, "clickidref", click.ClickId, RegexOptions.IgnoreCase);
+                        postBackUrl = Regex.Replace(postBackUrl, "msisdnref", click.Msisdn, RegexOptions.IgnoreCase);
+
+                        var request = new HttpRequestMessage(HttpMethod.Get, postBackUrl);
+
+                        var client = _httpClientFactory.CreateClient();
+                        var response = client.SendAsync(request).Result;
+                    }
+                }
+
+
                 var mt = new OutboundMessage
                 {
                     Destination = subscriber.Msisdn,
@@ -76,17 +116,42 @@ namespace DSPCHR.Jobs
                     UpdatedAt = DateTime.Now
                 };
 
+                // TODO: Make auto response user-controlled.
                 mt.Content = subscriber.FirstSubscribedAt == subscriber.LastSubscribedAt ?
                                 "Welcome to the service" :
                                 "Welcome back to the service";
 
-                _dbContext.Add(mt);
+                //_dbContext.Add(mt);
                 _dbContext.SaveChanges();
 
-                BackgroundJob.Enqueue<Jobs.Messages>((_messagesJob) => _messagesJob.SendToSubscriber(mt.Id));
+                //BackgroundJob.Enqueue<Jobs.Messages>((_messagesJob) => _messagesJob.SendToSubscriber(mt.Id));
 
             }
 
         }
+
+        public void SendActivationRequest(string msisdn, string offerCode, string shortCode = "")
+        {
+            _gatewayClient.Send("api/Subscriptions/Activate", 
+                ActivationJsonBody(msisdn, offerCode, shortCode)).Wait();
+        }
+
+        public void RegisterClick(string clickId, string campaignId)
+        {
+
+        }
+
+        private string ActivationJsonBody(string msisdn, string offerCode, string shortCode)
+        {
+            var requestBody = new
+            {
+                Msisdn = msisdn,
+                OfferCode = offerCode,
+                ShortCode = shortCode
+            };
+
+            return JsonSerializer.Serialize(requestBody);
+        }
+
     }
 }

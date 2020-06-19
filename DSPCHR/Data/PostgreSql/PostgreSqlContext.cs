@@ -17,7 +17,6 @@ namespace DSPCHR.Data.PostgreSql
             : base(options)
         {
             _configuration = configuration;
-            Database.Migrate();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)

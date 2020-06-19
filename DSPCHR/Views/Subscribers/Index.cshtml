@@ -1,16 +1,74 @@
 ﻿@model DSPCHR.ViewModels.SubscriberListViewModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Subscribers";
 }
 
-<h1>Index</h1>
+<h1>List</h1>
 
 <h3 class="text-right">Total: @Model.Subscribers.TotalItems</h3>
 
 @*<p>
-    <a asp-action="Create">Create New</a>
-</p>*@
+        <a asp-action="Create">Create New</a>
+    </p>*@
+<div>
+    <form asp-action="Index" method="get">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-row form-group align-items-center">
+            <div class="col-auto"><label>Last Subscribed &nbsp;</label></div>
+
+            <div class="col-auto">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">Between</div>
+                    </div>
+                    <input asp-for="@Model.From" class="form-control" />
+                </div>
+            </div>
+
+            <div class="col-auto">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">And</div>
+                    </div>
+                    <input asp-for="@Model.To" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row form-group align-items-center">
+
+            <div class="col-auto">
+                <label for="@Model.PhoneNumber">Subscriber Number: </label>
+            </div>
+
+            <div class="col-auto">
+                <input asp-for="@Model.PhoneNumber" placeholder="Phone number" class="form-control" />
+            </div>
+
+            <div class="col-auto">
+                <label for="@Model.OfferCode">Code: </label>
+            </div>
+
+            <div class="col-auto">
+                <select asp-for="@Model.OfferCode" asp-items="@Model.Offers" class="form-control"></select>
+            </div>
+
+            <div class="col-auto">
+                <label for="@Model.SubscriptionStatus">Current Status: </label>
+            </div>
+
+            <div class="col-auto">
+                <select asp-for="@Model.SubscriptionStatus" asp-items="@Model.Statuses" class="form-control"></select>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mb-2">Filter</button>
+    </form>
+</div>
+
+<hr />
 
 <table class="table">
     <thead>
@@ -47,58 +105,62 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Subscribers.Data) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Msisdn)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ShortCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OfferCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstSubscribedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastSubscribedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastUnsubscribedAt)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                @*<a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Subscribers.Data)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Msisdn)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsActive)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ShortCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OfferCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstSubscribedAt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastSubscribedAt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastUnsubscribedAt)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    @*<a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
 <div>
-    <cs-pager 
-        cs-paging-pagesize="@Model.Subscribers.PageSize"
-        cs-paging-pagenumber="@Model.Subscribers.PageNumber"
-        cs-paging-totalitems="@Model.Subscribers.TotalItems"
-        cs-pagenumber-param="pageNumber"
-        cs-paging-maxpageritems="10"
-        cs-show-first-last="false"
-        cs-show-numbered="false"
-        cs-use-reverse-increment="false"
-        cs-suppress-empty-nextprev="true"
-        cs-previous-page-text="< Newer"
-        cs-next-page-text="Older >"
-        cs-pager-li-current-class="page-item active"
-        cs-pager-li-other-class="page-item"
-        cs-pager-li-non-active-class="page-item disabled"
-        cs-pager-link-current-class="page-link"
-        cs-pager-link-other-class="page-link"
-        asp-controller="Subscribers"
-        asp-action="Index">
+    <cs-pager cs-paging-pagesize="@Model.Subscribers.PageSize"
+              cs-paging-pagenumber="@Model.Subscribers.PageNumber"
+              cs-paging-totalitems="@Model.Subscribers.TotalItems"
+              cs-pagenumber-param="pageNumber"
+              cs-paging-maxpageritems="10"
+              cs-show-first-last="false"
+              cs-show-numbered="false"
+              cs-use-reverse-increment="false"
+              cs-suppress-empty-nextprev="true"
+              cs-previous-page-text="< Newer"
+              cs-next-page-text="Older >"
+              cs-pager-li-current-class="page-item active"
+              cs-pager-li-other-class="page-item"
+              cs-pager-li-non-active-class="page-item disabled"
+              cs-pager-link-current-class="page-link"
+              cs-pager-link-other-class="page-link"
+              asp-controller="Subscribers"
+              asp-action="Index"
+              asp-route-phoneNumber="@Model.PhoneNumber"
+              asp-route-to="@Model.To?.ToString("s")"
+              asp-route-from="@Model.From?.ToString("s")"
+              asp-route-subscriptionStatus="@Model.SubscriptionStatus">
     </cs-pager>
 </div>

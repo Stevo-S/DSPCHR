@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using DSPCHR.Data;
@@ -63,6 +64,33 @@ namespace DSPCHR.Controllers
         {
         }
 
+        // POST: /api/subscriptions/activate
+        [HttpPost]
+        [Route("/api/subscriptions/activate")]
+        public ActionResult Activate(SubscriptionRequistion subscriptionRequistion)
+        {
+            if (ModelState.IsValid)
+            {
+                var webActivationClick = _context.WebActivationClicks.Find(subscriptionRequistion.ClickId);
+
+                // Add MSISDN to webActivationClick if it exists for the current click ID
+                if (webActivationClick != null)
+                {
+                    webActivationClick.Msisdn = subscriptionRequistion.Msisdn;
+                    webActivationClick.LastUpdated = DateTime.Now;
+                    _context.SaveChanges();
+                }
+
+                BackgroundJob.Enqueue(() => _subscriptionsJob.
+                    SendActivationRequest(subscriptionRequistion.Msisdn, 
+                                          subscriptionRequistion.OfferCode,
+                                          subscriptionRequistion.ShortCode ?? ""));
+                return Ok(new { Status = "Processing Activation Request" });
+            }
+
+            return BadRequest();
+        }
+
         private bool IsValid(Subscription subscription)
         {
             if (subscription == null)
@@ -77,5 +105,18 @@ namespace DSPCHR.Controllers
             return valid;
         }
 
+    }
+
+    public class SubscriptionRequistion
+    {
+        [DataType(DataType.PhoneNumber)]
+        public string Msisdn { get; set; }
+
+        [Required]
+        public string OfferCode { get; set; }
+
+        public string ShortCode { get; set; }
+        public long ClickId { get; set; }
+        public string CampaignId { get; set; }
     }
 }

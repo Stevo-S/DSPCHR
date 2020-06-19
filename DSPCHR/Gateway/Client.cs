@@ -18,7 +18,7 @@ namespace DSPCHR.Gateway
         }
 
         // Make HTTP request to the gateway
-        public void Send(string urlPath, string body)
+        public async Task Send(string urlPath, string body)
         {
             var url = new Uri(_client.BaseAddress + urlPath);
             var requestBody = new StringContent(body);
@@ -34,8 +34,18 @@ namespace DSPCHR.Gateway
             //requestBody.Headers.Add("X-Authorization", "Bearer " + _tokenManager.AccessToken);
             //requestBody.Headers.Add("sourceAddress", "1xx.2xx.2x7.xxx");
             //webRequest.Body = webRequest.Body + requestBody.Headers.ToString();
-            var response = _client.PostAsync(url, requestBody).Result;
-            var responseBody = response.Content.ReadAsStringAsync().Result;
+
+            try
+            {
+                var response = _client.PostAsync(url, requestBody).Result;
+                _ = await response.Content.ReadAsStringAsync();
+            }
+            catch(Exception e)
+            {
+                // TODO: Handle specific exceptions
+                ;
+            }
+            //var responseBody = await response.Content.ReadAsStringAsync();
 
             // Log Web Response
             //var webResponse = new WebResponse();

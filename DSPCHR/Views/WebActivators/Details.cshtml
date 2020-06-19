@@ -1,0 +1,20 @@
+﻿@model DSPCHR.Models.WebActivator
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<h1>Details</h1>*@
+
+<div>
+    <img src="@Url.Action("BannerImage", new { id = Model.Id})" alt="banner image" class="responsive_banner" />
+</div>
+<div>
+    <dl>
+        <dd>Post Back URL</dd>
+        <dt>@Model.PostBackUrl</dt>
+        <dd>Offer Code</dd>
+        <dt>@Model.Offer.OfferCode</dt>
+    </dl>
+</div>
